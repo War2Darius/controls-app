@@ -1,0 +1,499 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 2.5em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.add-form {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 10px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+button {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.cancel-btn {
+    background: #a0aec0;
+}
+
+.cancel-btn:hover {
+    background: #718096;
+}
+
+.table-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1600px;
+}
+
+th {
+    background: #667eea;
+    color: white;
+    padding: 15px 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #e1e1e1;
+    text-align: left;
+}
+
+tr:hover {
+    background: #f8f9fa;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-pending {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.status-in-progress {
+    background: #feebc8;
+    color: #c05621;
+}
+
+.status-completed {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.btn-edit,
+.btn-delete {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin: 0 3px;
+    transition: all 0.3s;
+}
+
+.btn-edit {
+    background: #4299e1;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #3182ce;
+}
+
+.btn-delete {
+    background: #f56565;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #e53e3e;
+}
+
+.filters {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filters input,
+.filters select {
+    padding: 10px 15px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 200px;
+}
+
+.search-box {
+    flex: 2;
+    min-width: 300px;
+}
+
+.export-btn {
+    background: #48bb78;
+}
+
+.export-btn:hover {
+    background: #38a169;
+}
+
+.import-btn {
+    background: #ed8936;
+}
+
+.import-btn:hover {
+    background: #dd6b20;
+}
+
+/* Стилі для статистики */
+.stats {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    gap: 15px;
+    font-weight: 600;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Стилі для блоку статусів */
+.stats-status {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Стилі для блоку напрямків */
+.stats-direction {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    margin-top: -10px;
+}
+
+/* Стилі для клікабельних елементів статистики */
+.stat-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px 15px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.stat-item.active-filter {
+    background: white;
+    color: #333;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+}
+
+/* Спеціальні кольори для різних типів */
+.stat-item.overdue-item {
+    background: rgba(245, 101, 101, 0.3);
+}
+
+.stat-item.overdue-item:hover {
+    background: rgba(245, 101, 101, 0.5);
+}
+
+/* Кнопка скидання фільтрів */
+.reset-filter-btn {
+    background: #cbd5e0;
+    color: #4a5568;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: auto;
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.reset-filter-btn:hover {
+    background: #a0aec0;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Стиль для поля "Інше" */
+#otherDirectionGroup {
+    transition: all 0.3s ease;
+}
+
+#otherDirection {
+    width: 100%;
+}
+
+/* Адаптація для мобільних */
+@media (max-width: 768px) {
+    .stats {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .reset-filter-btn {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 1700px) {
+    table {
+        min-width: 1600px;
+    }
+}
+/* ==================== ОНОВЛЕНІ СТИЛІ ДЛЯ ТАБЛИЦІ ==================== */
+
+/* Зменшуємо мінімальну ширину таблиці */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1200px; /* Зменшено з 1600px */
+}
+
+/* Стилі для колонок з довгим текстом */
+th:nth-child(2), /* Назва наказу */
+td:nth-child(2) {
+    max-width: 200px;
+    min-width: 150px;
+    word-wrap: break-word;
+    white-space: normal;
+    word-break: break-word;
+}
+
+th:nth-child(5), /* Заходи */
+td:nth-child(5) {
+    max-width: 250px;
+    min-width: 200px;
+    word-wrap: break-word;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Фіксована ширина для інших колонок */
+th:nth-child(1),
+td:nth-child(1) {
+    width: 50px;
+} /* № з/п */
+th:nth-child(3),
+td:nth-child(3) {
+    width: 100px;
+} /* Номер наказу */
+th:nth-child(4),
+td:nth-child(4) {
+    width: 100px;
+} /* Дата наказу */
+th:nth-child(6),
+td:nth-child(6) {
+    width: 120px;
+} /* Періодичність */
+th:nth-child(7),
+td:nth-child(7) {
+    width: 110px;
+} /* Термін виконання */
+th:nth-child(8),
+td:nth-child(8) {
+    width: 120px;
+} /* Відповідальний */
+th:nth-child(9),
+td:nth-child(9) {
+    width: 150px;
+} /* Напрям */
+th:nth-child(10),
+td:nth-child(10) {
+    width: 100px;
+} /* Статус */
+th:nth-child(11),
+td:nth-child(11) {
+    width: 80px;
+} /* Дії */
+
+/* Вирівнювання тексту в заголовках */
+th {
+    background: #667eea;
+    color: white;
+    padding: 12px 5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75em;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Стилі для комірок */
+td {
+    padding: 8px 5px;
+    border-bottom: 1px solid #e1e1e1;
+    text-align: left;
+    vertical-align: top;
+}
+
+/* Додаткові стилі для кращого вигляду */
+td:nth-child(2),
+td:nth-child(5) {
+    line-height: 1.4;
+}
+
+/* Стилі для статусів (трохи менші) */
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Стилі для кнопок дій */
+.btn-edit,
+.btn-delete {
+    padding: 3px 8px;
+    font-size: 0.8em;
+}
+
+/* Адаптація для різних розмірів екрану */
+@media (max-width: 1400px) {
+    table {
+        min-width: 1200px;
+    }
+
+    th {
+        font-size: 0.7em;
+        padding: 10px 3px;
+    }
+
+    td {
+        padding: 6px 3px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 1300px) {
+    th:nth-child(2),
+    td:nth-child(2) {
+        max-width: 150px;
+    }
+
+    th:nth-child(5),
+    td:nth-child(5) {
+        max-width: 200px;
+    }
+}
+/* Стилі для кнопки Excel */
+.export-excel-btn {
+    background: #38a169;
+    color: white;
+}
+
+.export-excel-btn:hover {
+    background: #2f855a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(56, 161, 105, 0.4);
+}
