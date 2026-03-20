@@ -2,6 +2,8 @@
 
 let currentEditId = null;
 let allRecords = [];
+let currentPdfBlob = null;
+let currentPdfName = null;
 
 // ==================== ФУНКЦІЇ ВІДОБРАЖЕННЯ ====================
 
@@ -22,7 +24,7 @@ function renderTable(records) {
 
   if (records.length === 0) {
     tbody.innerHTML =
-      '<tr><td colspan="11" style="text-align: center;">Немає даних для відображення</td></tr>';
+      '<tr><td colspan="12" style="text-align: center; padding: 30px;">Немає даних для відображення</td></tr>';
     return;
   }
 
@@ -53,6 +55,10 @@ function createRowHtml(row, index) {
     direction = `${DIRECTIONS.OTHER}: ${row.customDirection}`;
   }
 
+  const pdfIcon = row.pdfBlob ? 
+    `<span class="pdf-icon" onclick="openPdf(${row.id})" title="Відкрити PDF">📄</span>` : 
+    `<span class="pdf-icon pdf-icon-empty" title="PDF не прикріплено">📄</span>`;
+
   return `
         <tr id="row-${row.id}" ${isOverdue ? 'style="background-color: #fff5f5;"' : ""}>
             <td>${index}</td>
@@ -65,6 +71,7 @@ function createRowHtml(row, index) {
             <td>${row.responsible}</td>
             <td>${direction}</td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+            <td>${pdfIcon}</td>
             <td>
                 <button class="btn-edit" onclick="editRecord(${row.id})">✏️</button>
                 <button class="btn-delete" onclick="deleteRecord(${row.id})">🗑️</button>
@@ -146,7 +153,20 @@ async function addRecord() {
       recordData.customDirection = otherDirection;
     }
 
+    if (currentPdfBlob) {
+      recordData.pdfBlob = currentPdfBlob;
+      recordData.pdfName = currentPdfName;
+    }
+
     if (currentEditId) {
+      const existingRecord = await DB.service.getById(currentEditId);
+      if (currentPdfBlob) {
+        recordData.pdfBlob = currentPdfBlob;
+        recordData.pdfName = currentPdfName;
+      } else if (existingRecord && existingRecord.pdfBlob) {
+        recordData.pdfBlob = existingRecord.pdfBlob;
+        recordData.pdfName = existingRecord.pdfName;
+      }
       await DB.service.update(currentEditId, recordData);
       currentEditId = null;
       document.getElementById("submitBtn").textContent = "Додати запис";
@@ -193,6 +213,12 @@ async function editRecord(id) {
 
       document.getElementById("status").value =
         record.status || STATUSES.PENDING;
+
+      if (record.pdfName) {
+        document.getElementById("pdfFileName").textContent = record.pdfName;
+        document.getElementById("pdfFileName").style.display = "inline";
+        document.getElementById("clearPdfBtn").style.display = "inline-block";
+      }
 
       currentEditId = id;
       document.getElementById("submitBtn").textContent = "Оновити запис";
@@ -241,6 +267,7 @@ function clearForm() {
   document.getElementById("otherDirectionGroup").style.display = "none";
   document.getElementById("otherDirection").value = "";
   document.getElementById("status").value = STATUSES.PENDING;
+  clearPdfFile();
 }
 
 // ==================== ФІЛЬТРАЦІЯ ====================
@@ -424,7 +451,7 @@ function populateSelects() {
 async function initApp() {
   try {
     // Додаємо тестові дані якщо потрібно
-    await TestData.addIfNeeded(DB.instance);
+    // await TestData.addIfNeeded(DB.instance);
 
     // Завантажуємо дані
     await loadData();
@@ -432,12 +459,15 @@ async function initApp() {
     // Налаштовуємо обробники
     setupDirectionHandler();
 
+    // Налаштовуємо обробник PDF
+    setupPdfHandler();
+
     // Заповнюємо випадаючі списки
     populateSelects();
   } catch (error) {
     console.error("Помилка ініціалізації:", error);
     document.getElementById("tableBody").innerHTML =
-      '<tr><td colspan="11" style="text-align: center; color: red;">Помилка завантаження бази даних</td></tr>';
+      '<tr><td colspan="12" style="text-align: center; color: red; padding: 30px;">Помилка завантаження бази даних</td></tr>';
   }
 }
 
@@ -458,6 +488,60 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// ==================== PDF ФУНКЦІЇ ====================
+
+function setupPdfHandler() {
+  const pdfInput = document.getElementById("pdfInput");
+  const pdfFileName = document.getElementById("pdfFileName");
+  const clearPdfBtn = document.getElementById("clearPdfBtn");
+
+  pdfInput.addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        alert("Будь ласка, виберіть файл у форматі PDF!");
+        e.target.value = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        currentPdfBlob = event.target.result;
+        currentPdfName = file.name;
+        pdfFileName.textContent = file.name;
+        pdfFileName.style.display = "inline";
+        clearPdfBtn.style.display = "inline-block";
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  });
+}
+
+function clearPdfFile() {
+  currentPdfBlob = null;
+  currentPdfName = null;
+  document.getElementById("pdfInput").value = "";
+  document.getElementById("pdfFileName").textContent = "";
+  document.getElementById("pdfFileName").style.display = "none";
+  document.getElementById("clearPdfBtn").style.display = "none";
+}
+
+async function openPdf(id) {
+  try {
+    const record = await DB.service.getById(id);
+    if (record && record.pdfBlob) {
+      const blob = new Blob([record.pdfBlob], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } else {
+      alert("PDF документ не знайдено!");
+    }
+  } catch (error) {
+    console.error("Помилка відкриття PDF:", error);
+    alert("Помилка при відкритті PDF");
+  }
+}
+
 // Глобальні функції
 window.addRecord = addRecord;
 window.editRecord = editRecord;
@@ -466,3 +550,5 @@ window.cancelEdit = cancelEdit;
 window.filterTable = filterTable;
 window.filterByStat = filterByStat;
 window.resetFilters = resetFilters;
+window.clearPdfFile = clearPdfFile;
+window.openPdf = openPdf;

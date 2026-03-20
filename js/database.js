@@ -4,9 +4,9 @@
 const db = new Dexie("ControlsDatabase");
 
 // Визначаємо схему бази даних
-db.version(1).stores({
+db.version(2).stores({
   orders:
-    "++id, orderName, orderNumber, orderDate, measures, periodicity, deadline, responsible, direction, status, customDirection",
+    "++id, orderName, orderNumber, orderDate, measures, periodicity, deadline, responsible, direction, status, customDirection, pdfBlob, pdfName",
 });
 
 // Клас для роботи з базою даних

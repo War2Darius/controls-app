@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     background: white;
     border-radius: 15px;
@@ -77,7 +77,7 @@ h1 {
 }
 
 button {
-    background: #667eea;
+    background: #4299e1;
     color: white;
     border: none;
     padding: 12px 25px;
@@ -91,9 +91,9 @@ button {
 }
 
 button:hover {
-    background: #5a67d8;
+    background: #667eea;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
 }
 
 .cancel-btn {
@@ -105,37 +105,37 @@ button:hover {
 }
 
 .table-container {
-    overflow-x: auto;
     background: white;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    max-height: 600px;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1600px;
 }
 
 th {
     background: #667eea;
     color: white;
-    padding: 15px 8px;
+    padding: 12px 8px;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.8em;
-    letter-spacing: 1px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    font-size: 0.75em;
+    letter-spacing: 0.5px;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
 }
 
 td {
-    padding: 12px 8px;
+    padding: 10px 8px;
     border-bottom: 1px solid #e1e1e1;
-    text-align: left;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+    word-break: normal;
 }
 
 tr:hover {
@@ -232,7 +232,6 @@ tr:hover {
     background: #dd6b20;
 }
 
-/* Стилі для статистики */
 .stats {
     margin-bottom: 20px;
     padding: 15px;
@@ -245,20 +244,17 @@ tr:hover {
     align-items: center;
 }
 
-/* Стилі для блоку статусів */
 .stats-status {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 }
 
-/* Стилі для блоку напрямків */
 .stats-direction {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: white;
     margin-top: -10px;
 }
 
-/* Стилі для клікабельних елементів статистики */
 .stat-item {
     cursor: pointer;
     transition: all 0.3s ease;
@@ -284,7 +280,6 @@ tr:hover {
     font-weight: 700;
 }
 
-/* Спеціальні кольори для різних типів */
 .stat-item.overdue-item {
     background: rgba(245, 101, 101, 0.3);
 }
@@ -293,7 +288,6 @@ tr:hover {
     background: rgba(245, 101, 101, 0.5);
 }
 
-/* Кнопка скидання фільтрів */
 .reset-filter-btn {
     background: #cbd5e0;
     color: #4a5568;
@@ -313,7 +307,6 @@ tr:hover {
     transform: translateY(-2px);
 }
 
-/* Стиль для поля "Інше" */
 #otherDirectionGroup {
     transition: all 0.3s ease;
 }
@@ -322,7 +315,6 @@ tr:hover {
     width: 100%;
 }
 
-/* Адаптація для мобільних */
 @media (max-width: 768px) {
     .stats {
         flex-direction: column;
@@ -339,154 +331,6 @@ tr:hover {
     }
 }
 
-@media (max-width: 1700px) {
-    table {
-        min-width: 1600px;
-    }
-}
-/* ==================== ОНОВЛЕНІ СТИЛІ ДЛЯ ТАБЛИЦІ ==================== */
-
-/* Зменшуємо мінімальну ширину таблиці */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1200px; /* Зменшено з 1600px */
-}
-
-/* Стилі для колонок з довгим текстом */
-th:nth-child(2), /* Назва наказу */
-td:nth-child(2) {
-    max-width: 200px;
-    min-width: 150px;
-    word-wrap: break-word;
-    white-space: normal;
-    word-break: break-word;
-}
-
-th:nth-child(5), /* Заходи */
-td:nth-child(5) {
-    max-width: 250px;
-    min-width: 200px;
-    word-wrap: break-word;
-    white-space: normal;
-    word-break: break-word;
-}
-
-/* Фіксована ширина для інших колонок */
-th:nth-child(1),
-td:nth-child(1) {
-    width: 50px;
-} /* № з/п */
-th:nth-child(3),
-td:nth-child(3) {
-    width: 100px;
-} /* Номер наказу */
-th:nth-child(4),
-td:nth-child(4) {
-    width: 100px;
-} /* Дата наказу */
-th:nth-child(6),
-td:nth-child(6) {
-    width: 120px;
-} /* Періодичність */
-th:nth-child(7),
-td:nth-child(7) {
-    width: 110px;
-} /* Термін виконання */
-th:nth-child(8),
-td:nth-child(8) {
-    width: 120px;
-} /* Відповідальний */
-th:nth-child(9),
-td:nth-child(9) {
-    width: 150px;
-} /* Напрям */
-th:nth-child(10),
-td:nth-child(10) {
-    width: 100px;
-} /* Статус */
-th:nth-child(11),
-td:nth-child(11) {
-    width: 80px;
-} /* Дії */
-
-/* Вирівнювання тексту в заголовках */
-th {
-    background: #667eea;
-    color: white;
-    padding: 12px 5px;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75em;
-    letter-spacing: 0.5px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* Стилі для комірок */
-td {
-    padding: 8px 5px;
-    border-bottom: 1px solid #e1e1e1;
-    text-align: left;
-    vertical-align: top;
-}
-
-/* Додаткові стилі для кращого вигляду */
-td:nth-child(2),
-td:nth-child(5) {
-    line-height: 1.4;
-}
-
-/* Стилі для статусів (трохи менші) */
-.status-badge {
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-size: 0.8em;
-    font-weight: 600;
-    display: inline-block;
-    text-align: center;
-    white-space: nowrap;
-}
-
-/* Стилі для кнопок дій */
-.btn-edit,
-.btn-delete {
-    padding: 3px 8px;
-    font-size: 0.8em;
-}
-
-/* Адаптація для різних розмірів екрану */
-@media (max-width: 1400px) {
-    table {
-        min-width: 1200px;
-    }
-
-    th {
-        font-size: 0.7em;
-        padding: 10px 3px;
-    }
-
-    td {
-        padding: 6px 3px;
-        font-size: 0.9em;
-    }
-}
-
-@media (max-width: 1300px) {
-    th:nth-child(2),
-    td:nth-child(2) {
-        max-width: 150px;
-    }
-
-    th:nth-child(5),
-    td:nth-child(5) {
-        max-width: 200px;
-    }
-}
-/* Стилі для кнопки Excel */
 .export-excel-btn {
     background: #38a169;
     color: white;
@@ -496,4 +340,139 @@ td:nth-child(5) {
     background: #2f855a;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(56, 161, 105, 0.4);
+}
+
+/* ==================== PDF СТИЛІ ==================== */
+.pdf-upload-row {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    border: 2px dashed #e1e1e1;
+}
+
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-upload {
+    background: #ff0000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-upload:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+}
+
+.btn-upload::before {
+    content: "PDF";
+    display: inline-block;
+    background: white;
+    color: #ff0000;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 2px;
+    margin-right: 6px;
+    font-size: 0.8em;
+}
+
+.file-name {
+    color: #2d3748;
+    font-size: 0.9em;
+    font-weight: 500;
+    display: none;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-clear-pdf {
+    background: #f56565;
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+.btn-clear-pdf:hover {
+    background: #e53e3e;
+}
+
+.pdf-icon {
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.pdf-icon:hover {
+    transform: scale(1.2);
+}
+
+.pdf-icon-empty {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.pdf-icon-empty:hover {
+    transform: none;
+}
+
+/* Адаптивні стилі для таблиці */
+@media (max-width: 1200px) {
+    .add-form {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 13px;
+    }
+    
+    .status-badge {
+        font-size: 0.75em;
+        padding: 3px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .add-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 1.5em;
+    }
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.form-buttons button {
+    flex-shrink: 0;
+}
+
+.form-buttons button {
+    flex-shrink: 0;
 }

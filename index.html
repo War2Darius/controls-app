@@ -115,17 +115,48 @@
                     </select>
                 </div>
 
-                <button onclick="addRecord()" id="submitBtn">
-                    Додати запис
-                </button>
-                <button
-                    onclick="cancelEdit()"
-                    id="cancelBtn"
-                    class="cancel-btn"
-                    style="display: none"
-                >
-                    Скасувати
-                </button>
+                <div class="form-buttons">
+                    <button onclick="addRecord()" id="submitBtn">
+                        Додати запис
+                    </button>
+                    <button
+                        onclick="cancelEdit()"
+                        id="cancelBtn"
+                        class="cancel-btn"
+                        style="display: none"
+                    >
+                        Скасувати
+                    </button>
+                </div>
+
+                <div class="pdf-upload-row">
+                    <label style="font-weight: 600; color: #555">Додати:</label>
+                    <div class="file-upload-wrapper">
+                        <input
+                            type="file"
+                            id="pdfInput"
+                            accept="application/pdf"
+                            style="display: none"
+                        />
+                        <button
+                            type="button"
+                            class="btn-upload"
+                            onclick="
+                                document.getElementById('pdfInput').click()
+                            "
+                        ></button>
+                        <span id="pdfFileName" class="file-name"></span>
+                        <button
+                            type="button"
+                            class="btn-clear-pdf"
+                            id="clearPdfBtn"
+                            onclick="clearPdfFile()"
+                            style="display: none"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Фільтри -->
@@ -170,7 +201,7 @@
                 <table id="dataTable">
                     <thead>
                         <tr>
-                            <th>№ з/п</th>
+                            <th>№ <br />з/п</th>
                             <th>НАЗВА НАКАЗУ</th>
                             <th>НОМЕР НАКАЗУ</th>
                             <th>ДАТА НАКАЗУ</th>
@@ -180,12 +211,16 @@
                             <th>ВІДПОВІДАЛЬНИЙ</th>
                             <th>НАПРЯМОК</th>
                             <th>СТАТУС</th>
+                            <th>PDF</th>
                             <th>ДІЇ</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr>
-                            <td colspan="11" style="text-align: center">
+                            <td
+                                colspan="12"
+                                style="text-align: center; padding: 30px"
+                            >
                                 Завантаження даних...
                             </td>
                         </tr>
@@ -209,9 +244,9 @@
         <script src="js/database.js"></script>
         <script src="js/test-data.js"></script>
         <script src="js/export-import.js"></script>
-        <script src="js/settings.js"></script>
+        <!-- <script src="js/settings.js"></script> -->
         <script src="js/app.js"></script>
         <!-- ТЕСТОВИЙ МОДУЛЬ ДРУКУ (тимчасово) -->
-        <script src="js/print-test.js"></script>
+        <!-- <script src="js/print-test.js"></script> -->
     </body>
 </html>
