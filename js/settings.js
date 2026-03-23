@@ -121,7 +121,7 @@ function renderPeriodicityList() {
     .map(
       (opt, index) => `
       <li>
-        <span>${opt.label} (${opt.value})</span>
+        <span>${opt.label}</span>
         <div class="direction-actions">
           <button class="btn-edit-direction" onclick="startEditPeriodicity(${index})" title="Редагувати">✏️</button>
           <button class="btn-remove-person" onclick="removePeriodicity('${opt.value}')">✕</button>
