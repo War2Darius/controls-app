@@ -9,7 +9,7 @@ const STORAGE_KEYS = {
 
 // Стандартні значення (якщо в localStorage порожньо)
 const DEFAULT_SETTINGS = {
-  responsible: ["Мороз В.В.", "Лукащук Ф.М.", "Сторожук А.Л."],
+  responsible: [""],
   statuses: [
     { id: "pending", name: "Очікує", color: "#fed7d7", icon: "⏰" },
     { id: "in-progress", name: "В роботі", color: "#feebc8", icon: "⏳" },
