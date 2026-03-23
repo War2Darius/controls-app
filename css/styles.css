@@ -1,7 +1,7 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+margin: 0;
+padding: 0;
+box-sizing: border-box;
 }
 
 body {
@@ -59,6 +59,7 @@ h1 {
     transform: rotate(90deg);
 }
 
+/* ==================== ВИПРАВЛЕНА ФОРМА ==================== */
 .add-form {
     background: #f8f9fa;
     padding: 25px;
@@ -106,6 +107,110 @@ h1 {
     resize: vertical;
 }
 
+/* Контейнер для кнопок форми */
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.form-buttons button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* PDF блок */
+.pdf-upload-row {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    border: 2px dashed #e1e1e1;
+    flex-wrap: wrap;
+}
+
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ==================== АДАПТИВНІСТЬ ФОРМИ ==================== */
+
+/* Великі екрани (1200px+) */
+@media (min-width: 1200px) {
+    .add-form {
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: minmax(70px, auto);
+    }
+
+    .form-buttons {
+        grid-column: span 1;
+        align-self: end;
+    }
+
+    .pdf-upload-row {
+        grid-column: 1 / -1;
+        margin-top: 5px;
+    }
+}
+
+/* Середні екрани (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .add-form {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .form-buttons {
+        grid-column: span 1;
+    }
+
+    .pdf-upload-row {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Планшети (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .add-form {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-buttons {
+        grid-column: span 2;
+        justify-content: flex-end;
+    }
+
+    .pdf-upload-row {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Мобільні пристрої (до 768px) */
+@media (max-width: 767px) {
+    .add-form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-buttons {
+        grid-column: span 1;
+        justify-content: stretch;
+    }
+
+    .form-buttons button {
+        flex: 1;
+    }
+
+    .pdf-upload-row {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ==================== КНОПКИ ==================== */
 button {
     background: #4299e1;
     color: white;
@@ -134,16 +239,68 @@ button:hover {
     background: #718096;
 }
 
+.btn-upload {
+    background: #ff0000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-upload:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+}
+
+.btn-upload::before {
+    content: "PDF";
+    display: inline-block;
+    background: white;
+    color: #ff0000;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 2px;
+    margin-right: 6px;
+    font-size: 0.8em;
+}
+
+.btn-clear-pdf {
+    background: #f56565;
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+.btn-clear-pdf:hover {
+    background: #e53e3e;
+}
+
+.file-name {
+    color: #2d3748;
+    font-size: 0.9em;
+    font-weight: 500;
+    display: none;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ==================== ТАБЛИЦЯ ==================== */
 .table-container {
     background: white;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 800px;
 }
 
 th {
@@ -172,6 +329,7 @@ tr:hover {
     background: #f8f9fa;
 }
 
+/* ==================== СТАТУСИ ==================== */
 .status-badge {
     padding: 5px 10px;
     border-radius: 20px;
@@ -195,6 +353,7 @@ tr:hover {
     color: #22543d;
 }
 
+/* ==================== КНОПКИ ДІЙ ==================== */
 .btn-edit,
 .btn-delete {
     padding: 5px 10px;
@@ -224,6 +383,7 @@ tr:hover {
     background: #e53e3e;
 }
 
+/* ==================== ФІЛЬТРИ ==================== */
 .filters {
     margin-bottom: 20px;
     display: flex;
@@ -246,22 +406,7 @@ tr:hover {
     min-width: 300px;
 }
 
-.export-btn {
-    background: #48bb78;
-}
-
-.export-btn:hover {
-    background: #38a169;
-}
-
-.import-btn {
-    background: #ed8936;
-}
-
-.import-btn:hover {
-    background: #dd6b20;
-}
-
+/* ==================== СТАТИСТИКА ==================== */
 .stats {
     margin-bottom: 20px;
     padding: 15px;
@@ -337,28 +482,33 @@ tr:hover {
     transform: translateY(-2px);
 }
 
-#otherDirectionGroup {
-    transition: all 0.3s ease;
+/* ==================== ЕКСПОРТ/ІМПОРТ ==================== */
+.export-btn,
+.import-btn {
+    padding: 10px 15px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
-#otherDirection {
-    width: 100%;
+.export-btn {
+    background: #38a169;
+    color: white;
 }
 
-@media (max-width: 768px) {
-    .stats {
-        flex-direction: column;
-        align-items: stretch;
-    }
+.export-btn:hover {
+    background: #2f855a;
+}
 
-    .stat-item {
-        text-align: center;
-    }
+.import-btn {
+    background: #ed8936;
+    color: white;
+}
 
-    .reset-filter-btn {
-        margin-left: 0;
-        margin-top: 10px;
-    }
+.import-btn:hover {
+    background: #dd6b20;
 }
 
 .export-excel-btn {
@@ -372,138 +522,14 @@ tr:hover {
     box-shadow: 0 5px 15px rgba(56, 161, 105, 0.4);
 }
 
-/* ==================== PDF СТИЛІ ==================== */
-.pdf-upload-row {
-    grid-column: 1 / -1;
+.export-import-buttons {
     display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    background: #fff;
-    border-radius: 8px;
-    border: 2px dashed #e1e1e1;
-}
-
-.file-upload-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     flex-wrap: wrap;
-}
-
-.btn-upload {
-    background: #ff0000;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-size: 0.9em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-upload:hover {
-    background: #cc0000;
-    transform: translateY(-2px);
-}
-
-.btn-upload::before {
-    content: "PDF";
-    display: inline-block;
-    background: white;
-    color: #ff0000;
-    font-weight: bold;
-    padding: 2px 4px;
-    border-radius: 2px;
-    margin-right: 6px;
-    font-size: 0.8em;
-}
-
-.file-name {
-    color: #2d3748;
-    font-size: 0.9em;
-    font-weight: 500;
-    display: none;
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.btn-clear-pdf {
-    background: #f56565;
-    padding: 5px 10px;
-    font-size: 0.8em;
-}
-
-.btn-clear-pdf:hover {
-    background: #e53e3e;
-}
-
-.pdf-icon {
-    cursor: pointer;
-    font-size: 1.2em;
-    transition: transform 0.2s;
-    display: inline-block;
-}
-
-.pdf-icon:hover {
-    transform: scale(1.2);
-}
-
-.pdf-icon-empty {
-    opacity: 0.3;
-    cursor: default;
-}
-
-.pdf-icon-empty:hover {
-    transform: none;
-}
-
-/* Адаптивні стилі для таблиці */
-@media (max-width: 1200px) {
-    .add-form {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    }
-    
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-        font-size: 13px;
-    }
-    
-    .status-badge {
-        font-size: 0.75em;
-        padding: 3px 6px;
-    }
-}
-
-@media (max-width: 768px) {
-    .add-form {
-        grid-template-columns: 1fr;
-    }
-    
-    .container {
-        padding: 15px;
-    }
-    
-    h1 {
-        font-size: 1.5em;
-    }
-}
-
-.form-buttons {
-    display: flex;
     gap: 10px;
-    align-items: flex-end;
+    justify-content: center;
 }
 
-.form-buttons button {
-    flex-shrink: 0;
-}
-
-/* ==================== MODAL STYLES ==================== */
+/* ==================== МОДАЛЬНІ ВІКНА ==================== */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -547,34 +573,32 @@ tr:hover {
     text-align: center;
 }
 
-.add-person-form {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+/* Налаштування */
+.settings-modal {
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
-.add-person-form input {
-    flex: 1;
-    padding: 10px;
-    border: 2px solid #e1e1e1;
-    border-radius: 6px;
-    font-size: 14px;
+.settings-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e1e1e1;
 }
 
-.add-person-form button {
-    padding: 10px 15px;
-    background: #48bb78;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
+.settings-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
-.add-person-form button:hover {
-    background: #38a169;
+.settings-section h3 {
+    color: #555;
+    margin-bottom: 15px;
+    font-size: 1.1em;
 }
 
+/* Списки в налаштуваннях */
 .responsible-list {
     list-style: none;
     padding: 0;
@@ -607,31 +631,6 @@ tr:hover {
     background: #e53e3e;
 }
 
-/* ==================== SETTINGS MODAL ==================== */
-.settings-modal {
-    max-width: 500px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.settings-section {
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e1e1e1;
-}
-
-.settings-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.settings-section h3 {
-    color: #555;
-    margin-bottom: 15px;
-    font-size: 1.1em;
-}
-
 .direction-actions {
     display: flex;
     gap: 5px;
@@ -651,43 +650,56 @@ tr:hover {
     background: #3182ce;
 }
 
-/* ==================== EXPORT/IMPORT BUTTONS ==================== */
-.export-import-buttons {
+.add-person-form {
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
-    justify-content: center;
+    margin-bottom: 20px;
 }
 
-.export-import-buttons .export-btn,
-.export-import-buttons .import-btn {
+.add-person-form input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e1e1e1;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.add-person-form button {
     padding: 10px 15px;
-    font-size: 0.9em;
+    background: #48bb78;
+    color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.3s;
+    font-weight: 600;
 }
 
-.export-import-buttons .export-btn {
+.add-person-form button:hover {
     background: #38a169;
-    color: white;
 }
 
-.export-import-buttons .export-btn:hover {
-    background: #2f855a;
+/* PDF іконки */
+.pdf-icon {
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: transform 0.2s;
+    display: inline-block;
 }
 
-.export-import-buttons .import-btn {
-    background: #ed8936;
-    color: white;
+.pdf-icon:hover {
+    transform: scale(1.2);
 }
 
-.export-import-buttons .import-btn:hover {
-    background: #dd6b20;
+.pdf-icon-empty {
+    opacity: 0.3;
+    cursor: default;
 }
 
-/* ==================== FOOTER ==================== */
+.pdf-icon-empty:hover {
+    transform: none;
+}
+
+/* ==================== ФУТЕР ==================== */
 .footer {
     text-align: center;
     margin-top: 30px;
@@ -715,4 +727,118 @@ tr:hover {
 .github-link svg {
     width: 24px;
     height: 24px;
+}
+
+/* ==================== ДОДАТКОВІ АДАПТИВНІ СТИЛІ ==================== */
+@media (max-width: 1200px) {
+    .add-form {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 13px;
+    }
+
+    .status-badge {
+        font-size: 0.75em;
+        padding: 3px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .stats {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .reset-filter-btn {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .filters {
+        flex-direction: column;
+    }
+
+    .filters input,
+    .filters select {
+        width: 100%;
+    }
+
+    .search-box {
+        min-width: 100%;
+    }
+}
+
+/* ==================== СПОВІЩЕННЯ ==================== */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 1001;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.notification-success {
+    background: #48bb78;
+}
+
+.notification-error {
+    background: #f56565;
+}
+
+.notification-info {
+    background: #4299e1;
+}
+
+.notification.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* ==================== ІНШЕ ==================== */
+#otherDirectionGroup {
+transition: all 0.3s ease;
+}
+
+#otherDirection {
+width: 100%;
 }
