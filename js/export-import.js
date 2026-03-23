@@ -460,21 +460,12 @@ async function exportToExcel() {
   }
 }
 
-// Експорт в PDF (через друк)
-function exportToPDF() {
-  // Можна використати ту саму логіку, що й для друку
-  // Але відкрити вікно друку, де користувач зможе вибрати "Зберегти як PDF"
-  printReport();
-}
-
 // Робимо функції глобальними
 window.exportToJSON = exportToJSON;
 window.importFromJSON = importFromJSON;
 window.exportToExcel = exportToExcel;
-window.exportToPDF = exportToPDF;
 window.closeModal = closeModal;
 window.processImport = processImport;
-window.importFromCSV = importFromCSV;
 
 // ==================== CSV ІМПОРТ ====================
 
@@ -623,6 +614,8 @@ function convertDateToISO(dateStr) {
   // Якщо не вдалося розпарсити, повертаємо як є
   return dateStr;
 }
+
+window.importFromCSV = importFromCSV;
 
 // Додаємо обробник для CSV input
 document.addEventListener("DOMContentLoaded", function() {

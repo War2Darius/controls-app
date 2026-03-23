@@ -53,19 +53,6 @@ function updateDirection(oldName, newName) {
   return directions;
 }
 
-// Для зворотної сумісності - OBJECT для використання в коді
-const DIRECTIONS = {
-  get SERVICE() { return getDirections()[0] || "Службова діяльність"; },
-  get CHEMISTRY() { return getDirections()[1] || "Хімія"; },
-  get PYRO() { return getDirections()[2] || "Піротехніка"; },
-  get OTHER() { return getDirections()[3] || "Інше"; },
-};
-
-// Отримати всі напрямки як масив
-function getDirectionsArray() {
-  return getDirections();
-}
-
 // Відповідальні особи (з localStorage)
 function getResponsiblePersons() {
   const stored = localStorage.getItem(STORAGE_KEYS.RESPONSIBLE);
@@ -179,7 +166,6 @@ function getStatusKeys() {
 }
 
 // Для сумісності
-const PERIODICITY_OPTIONS = getPeriodicityOptions();
 const STATUSES = DEFAULT_STATUSES;
 const STATUS_LABELS = getStatusLabels();
 
@@ -188,36 +174,6 @@ const STATUS_CLASSES = {
   [DEFAULT_STATUSES.IN_PROGRESS]: "status-in-progress",
   [DEFAULT_STATUSES.COMPLETED]: "status-completed",
 };
-
-// Іконки для статистики
-const STATS_ICONS = {
-  total: "📊",
-  completed: "✅",
-  inProgress: "⏳",
-  pending: "⏰",
-  overdue: "⚠️",
-  service: "📋",
-  chemistry: "🧪",
-  pyro: "💥",
-  other: "🔄",
-};
-
-// Функція для отримання всіх напрямків (включаючи динамічні)
-function getAllDirections(records = []) {
-  const baseDirections = getDirections();
-
-  // Додаємо унікальні напрямки з поля "Інше"
-  const otherDirections = records
-    .filter((r) => r.direction === "Інше" && r.customDirection)
-    .map((r) => `Інше: ${r.customDirection}`);
-
-  return [...baseDirections, ...otherDirections];
-}
-
-// Функція для перевірки чи є напрямок стандартним
-function isStandardDirection(direction) {
-  return getDirections().includes(direction);
-}
 
 // Глобальні функції
 window.getDirections = getDirections;

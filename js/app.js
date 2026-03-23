@@ -502,7 +502,7 @@ function refreshMainPage() {
 async function initApp() {
   try {
     // Додаємо тестові дані якщо потрібно
-    // await TestData.addIfNeeded(DB.instance);
+    await TestData.addIfNeeded(DB.instance);
 
     // Завантажуємо дані
     await loadData();
