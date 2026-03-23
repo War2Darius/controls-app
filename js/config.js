@@ -7,7 +7,6 @@ const STORAGE_KEYS = {
   STATUS_LABELS: "controls_status_labels",
 };
 
-// Напрямки діяльності (тільки для резервного використання)
 const DEFAULT_DIRECTIONS = {
   SERVICE: "Службова діяльність",
   CHEMISTRY: "Хімія",
@@ -15,13 +14,16 @@ const DEFAULT_DIRECTIONS = {
   OTHER: "Інше",
 };
 
-// Напрямки (з localStorage)
+const DEFAULT_STATUSES = {
+  PENDING: "pending",
+  IN_PROGRESS: "in-progress",
+  COMPLETED: "completed",
+};
+
+// ==================== НАПРЯМКИ ====================
 function getDirections() {
   const stored = localStorage.getItem(STORAGE_KEYS.DIRECTIONS);
-  if (stored) {
-    return JSON.parse(stored);
-  }
-  return Object.values(DEFAULT_DIRECTIONS);
+  return stored ? JSON.parse(stored) : Object.values(DEFAULT_DIRECTIONS);
 }
 
 function setDirections(directions) {
@@ -53,13 +55,12 @@ function updateDirection(oldName, newName) {
   return directions;
 }
 
-// Відповідальні особи (з localStorage)
+// ==================== ВІДПОВІДАЛЬНІ ====================
 function getResponsiblePersons() {
   const stored = localStorage.getItem(STORAGE_KEYS.RESPONSIBLE);
-  if (stored) {
-    return JSON.parse(stored);
-  }
-  return ["Відповідальний 1", "Відповідальний 2", "Відповідальний 3"];
+  return stored
+    ? JSON.parse(stored)
+    : ["Іванов І.І.", "Петренко П.П.", "Сидоренко С.С."];
 }
 
 function setResponsiblePersons(persons) {
@@ -81,12 +82,10 @@ function removeResponsiblePerson(name) {
   return persons;
 }
 
-// Варіанти періодичності (з localStorage)
+// ==================== ПЕРІОДИЧНІСТЬ ====================
 function getPeriodicityOptions() {
   const stored = localStorage.getItem(STORAGE_KEYS.PERIODICITY);
-  if (stored) {
-    return JSON.parse(stored);
-  }
+  if (stored) return JSON.parse(stored);
   return [
     { value: "p_1", label: "Одноразово" },
     { value: "p_2", label: "Щодня" },
@@ -105,8 +104,8 @@ function setPeriodicityOptions(options) {
 
 function addPeriodicityOption(label) {
   const options = getPeriodicityOptions();
-  const value = "p_" + Date.now(); // Унікальний ID
-  if (label && !options.find(o => o.label === label)) {
+  const value = "p_" + Date.now();
+  if (label && !options.find((o) => o.label === label)) {
     options.push({ value, label });
     setPeriodicityOptions(options);
   }
@@ -114,14 +113,14 @@ function addPeriodicityOption(label) {
 }
 
 function removePeriodicityOption(value) {
-  const options = getPeriodicityOptions().filter(o => o.value !== value);
+  const options = getPeriodicityOptions().filter((o) => o.value !== value);
   setPeriodicityOptions(options);
   return options;
 }
 
 function updatePeriodicityOption(oldValue, newValue, newLabel) {
   const options = getPeriodicityOptions();
-  const index = options.findIndex(o => o.value === oldValue);
+  const index = options.findIndex((o) => o.value === oldValue);
   if (index !== -1) {
     options[index] = { value: newValue, label: newLabel };
     setPeriodicityOptions(options);
@@ -129,18 +128,10 @@ function updatePeriodicityOption(oldValue, newValue, newLabel) {
   return options;
 }
 
-// Статуси виконання (з localStorage)
-const DEFAULT_STATUSES = {
-  PENDING: "pending",
-  IN_PROGRESS: "in-progress",
-  COMPLETED: "completed",
-};
-
+// ==================== СТАТУСИ ====================
 function getStatusLabels() {
   const stored = localStorage.getItem(STORAGE_KEYS.STATUS_LABELS);
-  if (stored) {
-    return JSON.parse(stored);
-  }
+  if (stored) return JSON.parse(stored);
   return {
     [DEFAULT_STATUSES.PENDING]: "Очікує",
     [DEFAULT_STATUSES.IN_PROGRESS]: "В роботі",
@@ -165,32 +156,38 @@ function getStatusKeys() {
   return Object.keys(getStatusLabels());
 }
 
-// Для сумісності
-const STATUSES = DEFAULT_STATUSES;
-const STATUS_LABELS = getStatusLabels();
+// ==================== ДОПОМІЖНІ ФУНКЦІЇ ====================
+function escapeHtml(str) {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
-const STATUS_CLASSES = {
-  [DEFAULT_STATUSES.PENDING]: "status-pending",
-  [DEFAULT_STATUSES.IN_PROGRESS]: "status-in-progress",
-  [DEFAULT_STATUSES.COMPLETED]: "status-completed",
-};
+// ==================== ГЛОБАЛЬНІ ЕКСПОРТИ ====================
+window.STATUSES = DEFAULT_STATUSES;
+window.STATUS_LABELS = getStatusLabels();
 
-// Глобальні функції
 window.getDirections = getDirections;
 window.addDirection = addDirection;
 window.removeDirectionFromList = removeDirectionFromList;
 window.updateDirection = updateDirection;
+
 window.getResponsiblePersons = getResponsiblePersons;
 window.addResponsiblePerson = addResponsiblePerson;
 window.removeResponsiblePerson = removeResponsiblePerson;
-window.setDirections = setDirections;
 window.setResponsiblePersons = setResponsiblePersons;
+
 window.getPeriodicityOptions = getPeriodicityOptions;
 window.addPeriodicityOption = addPeriodicityOption;
 window.removePeriodicityOption = removePeriodicityOption;
 window.updatePeriodicityOption = updatePeriodicityOption;
+
 window.getStatusLabels = getStatusLabels;
 window.updateStatusLabel = updateStatusLabel;
 window.getStatusKeys = getStatusKeys;
-window.STATUSES = DEFAULT_STATUSES;
-window.STATUS_LABELS = STATUS_LABELS;
+
+window.escapeHtml = escapeHtml;

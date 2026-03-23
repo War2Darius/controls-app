@@ -36,7 +36,7 @@ function renderTable(records) {
   tbody.innerHTML = html;
 }
 
-// Створення HTML рядка таблиці
+// Створення HTML рядка таблиці (виправлена версія з escapeHtml)
 function createRowHtml(row, index) {
   const statusLabels = window.getStatusLabels();
   const statusKeys = window.getStatusKeys();
@@ -54,11 +54,11 @@ function createRowHtml(row, index) {
 
   // Перевірка на прострочений термін
   const today = new Date().toISOString().split("T")[0];
-  const isOverdue = row.deadline < today && row.status !== window.STATUSES.COMPLETED;
+  const isOverdue =
+    row.deadline < today && row.status !== window.STATUSES.COMPLETED;
 
   // Відображення напрямку (якщо "Інше", показуємо що саме)
   let direction = row.direction;
-  const directions = getDirections();
   if (direction === "Інше" && row.customDirection) {
     direction = `Інше: ${row.customDirection}`;
   }
@@ -67,7 +67,7 @@ function createRowHtml(row, index) {
   let periodicityText = row.periodicity || "Не вказано";
   if (row.periodicity) {
     const periodicityOptions = window.getPeriodicityOptions();
-    const found = periodicityOptions.find(p => p.value === row.periodicity);
+    const found = periodicityOptions.find((p) => p.value === row.periodicity);
     if (found) {
       periodicityText = found.label;
     }
@@ -77,25 +77,26 @@ function createRowHtml(row, index) {
     ? `<span class="pdf-icon" onclick="openPdf(${row.id})" title="Відкрити PDF">📄</span>`
     : `<span class="pdf-icon pdf-icon-empty" title="PDF не прикріплено">📄</span>`;
 
+  // ВИПРАВЛЕНО: додано escapeHtml для всіх текстових полів
   return `
-        <tr id="row-${row.id}" ${isOverdue ? 'style="background-color: #fff5f5;"' : ""}>
-            <td>${index}</td>
-            <td title="${row.orderName}">${row.orderName}</td>
-            <td>${row.orderNumber}</td>
-            <td>${orderDate}</td>
-            <td title="${row.measures}">${row.measures}</td>
-            <td>${periodicityText}</td>
-            <td>${deadline} ${isOverdue ? "⚠️" : ""}</td>
-            <td>${row.responsible}</td>
-            <td>${direction}</td>
-            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-            <td>${pdfIcon}</td>
-            <td>
-                <button class="btn-edit" onclick="editRecord(${row.id})">✏️</button>
-                <button class="btn-delete" onclick="deleteRecord(${row.id})">🗑️</button>
-            </td>
-        </tr>
-    `;
+  <tr id="row-${row.id}" ${isOverdue ? 'style="background-color: #fff5f5;"' : ""}>
+  <td>${index}</td>
+  <td title="${escapeHtml(row.orderName)}">${escapeHtml(row.orderName)}</td>
+  <td>${escapeHtml(row.orderNumber)}</td>
+  <td>${orderDate}</td>
+  <td title="${escapeHtml(row.measures)}">${escapeHtml(row.measures)}</td>
+  <td>${escapeHtml(periodicityText)}</td>
+  <td>${deadline} ${isOverdue ? "⚠️" : ""}</td>
+  <td>${escapeHtml(row.responsible)}</td>
+  <td>${escapeHtml(direction)}</td>
+  <td><span class="status-badge ${statusClass}">${escapeHtml(statusText)}</span></td>
+  <td>${pdfIcon}</td>
+  <td>
+  <button class="btn-edit" onclick="editRecord(${row.id})">✏️</button>
+  <button class="btn-delete" onclick="deleteRecord(${row.id})">🗑️</button>
+  </td>
+  </tr>
+  `;
 }
 
 // Оновлення статистики
@@ -108,13 +109,13 @@ async function updateStats() {
   // Блок статусів - динамічний
   const statusIcons = ["✅", "⏳", "⏰"];
   let statusHtml = `<span class="stat-item" onclick="filterByStat('all')">📊 Всього: ${stats.total}</span>`;
-  
+
   statusKeys.forEach((key, index) => {
     const icon = statusIcons[index] || "📋";
     const count = stats[key] || 0;
     statusHtml += `<span class="stat-item" onclick="filterByStat('${key}')">${icon} ${statusLabels[key]}: ${count}</span>`;
   });
-  
+
   statusHtml += `<span class="stat-item overdue-item" onclick="filterByStat('overdue')">⚠️ Прострочено: ${stats.overdue}</span>`;
   statusHtml += `<button class="reset-filter-btn" onclick="resetFilters()">🔄 Скинути</button>`;
 
@@ -123,15 +124,17 @@ async function updateStats() {
   // Блок напрямків - динамічний
   let directionsHtml = "";
   const dirIcons = ["📋", "🧪", "💥", "🔄"];
-  
+
   directions.forEach((dir, index) => {
     const icon = dirIcons[index] || "📋";
     const count = stats[dir] || 0;
     directionsHtml += `<span class="stat-item" onclick="filterByStat('direction', '${dir}')">${icon} ${dir}: ${count}</span>`;
   });
-  
+
   directionsHtml += `<span style="flex: 1;"></span>`;
-  const totalDirections = Object.keys(stats).filter(k => directions.includes(k)).reduce((sum, k) => sum + stats[k], 0);
+  const totalDirections = Object.keys(stats)
+    .filter((k) => directions.includes(k))
+    .reduce((sum, k) => sum + stats[k], 0);
   directionsHtml += `<span class="stat-item" style="background: rgba(255,255,255,0.1); cursor: default;">🏷️ Всього напрямків: ${totalDirections}</span>`;
 
   document.getElementById("statsDirection").innerHTML = directionsHtml;
@@ -165,7 +168,16 @@ async function addRecord() {
     alert("Будь ласка, заповніть всі поля!");
     return;
   }
+  // Додати після перевірки заповнених полів, перед try
+  const orderDateObj = new Date(orderDate);
+  const deadlineObj = new Date(deadline);
 
+  if (orderDateObj > deadlineObj) {
+    alert(
+      `❌ Дата наказу (${orderDateObj.toLocaleDateString("uk-UA")}) не може бути пізніше терміну виконання (${deadlineObj.toLocaleDateString("uk-UA")})!`,
+    );
+    return;
+  }
   try {
     const directions = getDirections();
     const recordData = {
@@ -339,7 +351,8 @@ async function filterByStat(type, value = null) {
     const statusLabels = window.getStatusLabels();
     const statusKeys = window.getStatusKeys();
     const statusLabelsArray = Object.values(statusLabels);
-    const completedStatus = statusKeys[statusLabelsArray.indexOf("Виконано")] || statusKeys[2];
+    const completedStatus =
+      statusKeys[statusLabelsArray.indexOf("Виконано")] || statusKeys[2];
 
     document.getElementById("searchInput").value = "";
     document.getElementById("statusFilter").value = "all";
@@ -449,9 +462,9 @@ function updatePeriodicitySelect() {
   const options = window.getPeriodicityOptions();
   periodicitySelect.innerHTML =
     '<option value="">Оберіть періодичність</option>' +
-    options.map(
-      (p) => `<option value="${p.value}">${p.label}</option>`,
-    ).join("");
+    options
+      .map((p) => `<option value="${p.value}">${escapeHtml(p.label)}</option>`)
+      .join("");
 }
 
 function updateDirectionSelect() {
@@ -476,9 +489,7 @@ function updateStatusSelect() {
   const statusSelect = document.getElementById("status");
   const labels = window.getStatusLabels();
   statusSelect.innerHTML = Object.entries(labels)
-    .map(
-      ([key, label]) => `<option value="${key}">${label}</option>`,
-    )
+    .map(([key, label]) => `<option value="${key}">${label}</option>`)
     .join("");
 }
 
@@ -488,9 +499,7 @@ function updateStatusFilter() {
   statusFilter.innerHTML =
     '<option value="all">📋 Всі записи</option>' +
     Object.entries(labels)
-      .map(
-        ([key, label]) => `<option value="${key}">${label}</option>`,
-      )
+      .map(([key, label]) => `<option value="${key}">${label}</option>`)
       .join("");
 }
 
@@ -596,6 +605,7 @@ async function openPdf(id) {
 // Глобальні функції
 window.addRecord = addRecord;
 window.editRecord = editRecord;
+window.escapeHtml = escapeHtml;
 window.deleteRecord = deleteRecord;
 window.cancelEdit = cancelEdit;
 window.filterTable = filterTable;

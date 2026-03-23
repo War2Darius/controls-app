@@ -8,16 +8,14 @@
     </head>
     <body>
         <div class="container">
-            <div class="header-with-settings">
-                <h1>📋 Облік контролів та протокольних рішень</h1>
-                <button
-                    type="button"
-                    class="btn-settings"
-                    onclick="openSettings()"
-                >
-                    ⚙️
-                </button>
-            </div>
+    <!-- Версія в лівому верхньому куті -->
+    <div class="version-badge">v2.0.0</div>
+
+    <div class="header-with-settings">
+        <h1>📋 Облік контролів та протокольних рішень</h1>
+        <button type="button" class="btn-settings" onclick="openSettings()">⚙️</button>
+    </div>
+    <!-- решта коду -->
 
             <!-- Форма для додавання -->
             <div class="add-form" id="addForm">
@@ -60,14 +58,7 @@
                     <label>Періодичність виконання</label>
                     <select id="periodicity" required>
                         <option value="">Оберіть періодичність</option>
-                        <option value="Одноразово">Одноразово</option>
-                        <option value="Щодня">Щодня</option>
-                        <option value="Щотижня">Щотижня</option>
-                        <option value="Щомісяця">Щомісяця</option>
-                        <option value="Щокварталу">Щокварталу</option>
-                        <option value="Раз на півроку">Раз на півроку</option>
-                        <option value="Щорічно">Щорічно</option>
-                        <option value="За потреби">За потреби</option>
+                        <!-- Опції будуть додані через JavaScript -->
                     </select>
                 </div>
 
@@ -114,8 +105,7 @@
 
                 <div class="form-group">
                     <label>Статус</label>
-                    <select id="status">
-                    </select>
+                    <select id="status"></select>
                 </div>
 
                 <div class="form-buttons">
@@ -248,65 +238,172 @@
         <script src="js/settings.js"></script>
         <script src="js/app.js"></script>
 
-        <!-- Модальне вікно налаштувань -->
-        <div id="settingsModal" class="modal" style="display: none">
-            <div class="modal-content settings-modal">
-                <span class="modal-close" onclick="closeSettings()"
-                    >&times;</span
-                >
-                <h2>Налаштування</h2>
+        <!-- Модальне вікно налаштувань з вкладками -->
+        <div id="settingsModal" style="display: none">
+            <div class="settings-modal">
+                <div class="modal-header">
+                    <h2>⚙️ Налаштування</h2>
+                    <button
+                        class="modal-close-btn"
+                        onclick="closeSettings()"
+                        title="Закрити (Esc)"
+                    >
+                        ✕
+                    </button>
+                </div>
 
-                <div class="settings-section">
-                    <h3>Відповідальні</h3>
-                    <div class="add-person-form">
-                        <input
-                            type="text"
-                            id="newResponsibleName"
-                            placeholder="ПІБ працівника"
-                        />
-                        <button onclick="addNewResponsible()">Додати</button>
+                <div class="tabs">
+                    <button
+                        class="tab-btn active"
+                        data-tab="tab-responsible"
+                        onclick="switchTab('tab-responsible')"
+                    >
+                        👥 Відповідальні
+                    </button>
+                    <button
+                        class="tab-btn"
+                        data-tab="tab-directions"
+                        onclick="switchTab('tab-directions')"
+                    >
+                        📂 Напрямки
+                    </button>
+                    <button
+                        class="tab-btn"
+                        data-tab="tab-periodicity"
+                        onclick="switchTab('tab-periodicity')"
+                    >
+                        🔄 Періодичність
+                    </button>
+                    <button
+                        class="tab-btn"
+                        data-tab="tab-statuses"
+                        onclick="switchTab('tab-statuses')"
+                    >
+                        🏷️ Статуси
+                    </button>
+                    <button
+                        class="tab-btn"
+                        data-tab="tab-export"
+                        onclick="switchTab('tab-export')"
+                    >
+                        📤 Експорт/Імпорт
+                    </button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Вкладка 1: Відповідальні -->
+                    <div id="tab-responsible" class="tab-pane active">
+                        <div class="add-form-inline">
+                            <input
+                                type="text"
+                                id="newResponsibleName"
+                                placeholder="ПІБ працівника"
+                                autocomplete="off"
+                            />
+                            <button onclick="addNewResponsible()">
+                                ➕ Додати
+                            </button>
+                        </div>
+                        <ul id="responsibleList" class="settings-list"></ul>
+                        <p class="hint-text">
+                            💡 Порада: Відповідальні особи будуть доступні у
+                            випадаючому списку при додаванні запису.
+                        </p>
                     </div>
-                    <ul id="responsibleList" class="responsible-list"></ul>
-                </div>
 
-                <div class="settings-section">
-                    <h3>Напрямки</h3>
-                    <div class="add-person-form">
-                        <input
-                            type="text"
-                            id="newDirectionName"
-                            placeholder="Назва напрямку"
-                        />
-                        <button onclick="addNewDirection()">Додати</button>
+                    <!-- Вкладка 2: Напрямки -->
+                    <div id="tab-directions" class="tab-pane">
+                        <div class="add-form-inline">
+                            <input
+                                type="text"
+                                id="newDirectionName"
+                                placeholder="Назва напрямку"
+                                autocomplete="off"
+                            />
+                            <button onclick="addNewDirection()">
+                                ➕ Додати
+                            </button>
+                        </div>
+                        <ul id="directionsList" class="settings-list"></ul>
+                        <p class="hint-text">
+                            💡 Порада: Напрямки використовуються для фільтрації
+                            та статистики.
+                        </p>
                     </div>
-                    <ul id="directionsList" class="responsible-list"></ul>
-                </div>
 
-                <div class="settings-section">
-                    <h3>Періодичність</h3>
-                    <div class="add-person-form">
-                        <input
-                            type="text"
-                            id="newPeriodicityLabel"
-                            placeholder="Назва періодичності"
-                        />
-                        <button onclick="addNewPeriodicity()">Додати</button>
+                    <!-- Вкладка 3: Періодичність -->
+                    <div id="tab-periodicity" class="tab-pane">
+                        <div class="add-form-inline">
+                            <input
+                                type="text"
+                                id="newPeriodicityLabel"
+                                placeholder="Назва періодичності"
+                                autocomplete="off"
+                            />
+                            <button onclick="addNewPeriodicity()">
+                                ➕ Додати
+                            </button>
+                        </div>
+                        <ul id="periodicityList" class="settings-list"></ul>
+                        <p class="hint-text">
+                            💡 Порада: Періодичність допомагає планувати
+                            повторювані завдання.
+                        </p>
                     </div>
-                    <ul id="periodicityList" class="responsible-list"></ul>
-                </div>
 
-                <div class="settings-section">
-                    <h3>Статуси</h3>
-                    <ul id="statusList" class="responsible-list"></ul>
-                </div>
+                    <!-- Вкладка 4: Статуси -->
+                    <div id="tab-statuses" class="tab-pane">
+                        <ul id="statusList" class="settings-list"></ul>
+                        <p class="hint-text">
+                            💡 Порада: Статуси визначають етап виконання
+                            завдання. Натисніть ✏️ для редагування назви.
+                        </p>
+                    </div>
 
-                <div class="settings-section">
-                    <h3>Експорт / Імпорт</h3>
-                    <div class="export-import-buttons">
-                        <button class="export-btn" onclick="exportToExcel()">📊 Excel (CSV)</button>
-                        <button class="export-btn" onclick="exportToJSON()">📋 JSON</button>
-                        <button class="import-btn" onclick="importFromJSON()">📥 JSON</button>
-                        <button class="import-btn" onclick="importFromCSV()">📥 CSV</button>
+                    <!-- Вкладка 5: Експорт / Імпорт -->
+                    <div id="tab-export" class="tab-pane">
+                        <div class="export-import-section">
+                            <h3 style="margin-bottom: 15px; color: #333">
+                                📁 Експорт даних
+                            </h3>
+                            <div class="export-import-buttons">
+                                <button
+                                    class="export-btn"
+                                    onclick="exportToExcel()"
+                                >
+                                    📊 Excel (CSV)
+                                </button>
+                                <button
+                                    class="export-btn"
+                                    onclick="exportToJSON()"
+                                >
+                                    📋 JSON
+                                </button>
+                            </div>
+
+                            <h3 style="margin: 25px 0 15px; color: #333">
+                                📥 Імпорт даних
+                            </h3>
+                            <div class="export-import-buttons">
+                                <button
+                                    class="import-btn"
+                                    onclick="importFromJSON()"
+                                >
+                                    📥 Імпорт JSON
+                                </button>
+                                <button
+                                    class="import-btn"
+                                    onclick="importFromCSV()"
+                                >
+                                    📥 Імпорт CSV
+                                </button>
+                            </div>
+
+                            <p class="hint-text" style="margin-top: 20px">
+                                ⚠️ Увага: При імпорті ви зможете вибрати режим
+                                заміни, об'єднання або додавання даних.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -314,9 +411,20 @@
 
         <!-- Підвал з посиланням на GitHub -->
         <div class="footer">
-            <a href="https://github.com/War2Darius/controls-app" target="_blank" class="github-link">
-                <svg height="24" viewBox="0 0 16 16" width="24" fill="currentColor">
-                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            <a
+                href="https://github.com/War2Darius/controls-app"
+                target="_blank"
+                class="github-link"
+            >
+                <svg
+                    height="24"
+                    viewBox="0 0 16 16"
+                    width="24"
+                    fill="currentColor"
+                >
+                    <path
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                    />
                 </svg>
                 GitHub
             </a>
