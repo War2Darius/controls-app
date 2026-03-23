@@ -63,6 +63,16 @@ function createRowHtml(row, index) {
     direction = `Інше: ${row.customDirection}`;
   }
 
+  // Відображення періодичності (ключ -> назва)
+  let periodicityText = row.periodicity || "Не вказано";
+  if (row.periodicity) {
+    const periodicityOptions = window.getPeriodicityOptions();
+    const found = periodicityOptions.find(p => p.value === row.periodicity);
+    if (found) {
+      periodicityText = found.label;
+    }
+  }
+
   const pdfIcon = row.pdfBlob
     ? `<span class="pdf-icon" onclick="openPdf(${row.id})" title="Відкрити PDF">📄</span>`
     : `<span class="pdf-icon pdf-icon-empty" title="PDF не прикріплено">📄</span>`;
@@ -74,7 +84,7 @@ function createRowHtml(row, index) {
             <td>${row.orderNumber}</td>
             <td>${orderDate}</td>
             <td title="${row.measures}">${row.measures}</td>
-            <td>${row.periodicity || "Не вказано"}</td>
+            <td>${periodicityText}</td>
             <td>${deadline} ${isOverdue ? "⚠️" : ""}</td>
             <td>${row.responsible}</td>
             <td>${direction}</td>
@@ -92,35 +102,39 @@ function createRowHtml(row, index) {
 async function updateStats() {
   const stats = await DB.service.getStats();
   const directions = getDirections();
+  const statusLabels = window.getStatusLabels();
+  const statusKeys = window.getStatusKeys();
 
-  // Блок статусів
-  document.getElementById("statsStatus").innerHTML = `
-        <span class="stat-item" onclick="filterByStat('all')">${STATS_ICONS.total} Всього: ${stats.total}</span>
-        <span class="stat-item" onclick="filterByStat('completed')">${STATS_ICONS.completed} Виконано: ${stats.completed}</span>
-        <span class="stat-item" onclick="filterByStat('in-progress')">${STATS_ICONS.inProgress} В роботі: ${stats.inProgress}</span>
-        <span class="stat-item" onclick="filterByStat('pending')">${STATS_ICONS.pending} Очікує: ${stats.pending}</span>
-        <span class="stat-item overdue-item" onclick="filterByStat('overdue')">${STATS_ICONS.overdue} Прострочено: ${stats.overdue}</span>
-        <button class="reset-filter-btn" onclick="resetFilters()">🔄 Скинути фільтри</button>
-    `;
+  // Блок статусів - динамічний
+  const statusIcons = ["✅", "⏳", "⏰"];
+  let statusHtml = `<span class="stat-item" onclick="filterByStat('all')">📊 Всього: ${stats.total}</span>`;
+  
+  statusKeys.forEach((key, index) => {
+    const icon = statusIcons[index] || "📋";
+    const count = stats[key] || 0;
+    statusHtml += `<span class="stat-item" onclick="filterByStat('${key}')">${icon} ${statusLabels[key]}: ${count}</span>`;
+  });
+  
+  statusHtml += `<span class="stat-item overdue-item" onclick="filterByStat('overdue')">⚠️ Прострочено: ${stats.overdue}</span>`;
+  statusHtml += `<button class="reset-filter-btn" onclick="resetFilters()">🔄 Скинути</button>`;
+
+  document.getElementById("statsStatus").innerHTML = statusHtml;
 
   // Блок напрямків - динамічний
   let directionsHtml = "";
-  const icons = [STATS_ICONS.service, STATS_ICONS.chemistry, STATS_ICONS.pyro, STATS_ICONS.other];
-  const statsValues = [stats.service, stats.chemistry, stats.pyro, stats.other];
+  const dirIcons = ["📋", "🧪", "💥", "🔄"];
   
   directions.forEach((dir, index) => {
-    const icon = icons[index] || STATS_ICONS.other;
-    const count = statsValues[index] || 0;
+    const icon = dirIcons[index] || "📋";
+    const count = stats[dir] || 0;
     directionsHtml += `<span class="stat-item" onclick="filterByStat('direction', '${dir}')">${icon} ${dir}: ${count}</span>`;
   });
+  
+  directionsHtml += `<span style="flex: 1;"></span>`;
+  const totalDirections = Object.keys(stats).filter(k => directions.includes(k)).reduce((sum, k) => sum + stats[k], 0);
+  directionsHtml += `<span class="stat-item" style="background: rgba(255,255,255,0.1); cursor: default;">🏷️ Всього напрямків: ${totalDirections}</span>`;
 
-  document.getElementById("statsDirection").innerHTML = `
-        ${directionsHtml}
-        <span style="flex: 1;"></span>
-        <span class="stat-item" style="background: rgba(255,255,255,0.1); cursor: default;">
-            🏷️ Всього напрямків: ${Object.values(stats).reduce((a, b) => a + b, 0) - stats.total}
-        </span>
-    `;
+  document.getElementById("statsDirection").innerHTML = directionsHtml;
 }
 
 // ==================== CRUD ОПЕРАЦІЇ ====================
@@ -322,6 +336,10 @@ async function filterByStat(type, value = null) {
     let filtered = allRecords;
     const today = new Date().toISOString().split("T")[0];
     const directions = getDirections();
+    const statusLabels = window.getStatusLabels();
+    const statusKeys = window.getStatusKeys();
+    const statusLabelsArray = Object.values(statusLabels);
+    const completedStatus = statusKeys[statusLabelsArray.indexOf("Виконано")] || statusKeys[2];
 
     document.getElementById("searchInput").value = "";
     document.getElementById("statusFilter").value = "all";
@@ -330,23 +348,17 @@ async function filterByStat(type, value = null) {
       case "all":
         filtered = allRecords;
         break;
-      case "completed":
-        filtered = allRecords.filter((r) => r.status === window.STATUSES.COMPLETED);
-        break;
-      case "in-progress":
-        filtered = allRecords.filter((r) => r.status === window.STATUSES.IN_PROGRESS);
-        break;
-      case "pending":
-        filtered = allRecords.filter((r) => r.status === window.STATUSES.PENDING);
-        break;
       case "overdue":
         filtered = allRecords.filter(
-          (r) => r.deadline < today && r.status !== window.STATUSES.COMPLETED,
+          (r) => r.deadline < today && r.status !== completedStatus,
         );
         break;
       case "direction":
         filtered = allRecords.filter((r) => r.direction === value);
         break;
+      default:
+        // Динамічний статус
+        filtered = allRecords.filter((r) => r.status === type);
     }
 
     renderTable(filtered);

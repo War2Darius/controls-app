@@ -73,6 +73,8 @@ class DatabaseService {
     const all = await this.getAll();
     const today = new Date().toISOString().split("T")[0];
     const directions = getDirections();
+    const statusLabels = window.getStatusLabels ? window.getStatusLabels() : window.STATUS_LABELS;
+    const statusKeys = Object.keys(statusLabels);
 
     // Підрахунок за напрямками
     const directionStats = {};
@@ -80,14 +82,21 @@ class DatabaseService {
       directionStats[dir] = all.filter(r => r.direction === dir).length;
     });
 
+    // Підрахунок за статусами
+    const statusStats = {};
+    statusKeys.forEach(key => {
+      statusStats[key] = all.filter(r => r.status === key).length;
+    });
+
+    // Овердью рахуємо як записи з датою меньше сьогоднішньої і не виконані
+    const overdueCount = all.filter(
+      (r) => r.deadline < today && !statusKeys.includes(r.status),
+    ).length;
+
     return {
       total: all.length,
-      completed: all.filter((r) => r.status === STATUSES.COMPLETED).length,
-      pending: all.filter((r) => r.status === STATUSES.PENDING).length,
-      inProgress: all.filter((r) => r.status === STATUSES.IN_PROGRESS).length,
-      overdue: all.filter(
-        (r) => r.deadline < today && r.status !== STATUSES.COMPLETED,
-      ).length,
+      ...statusStats,
+      overdue: overdueCount,
 
       // Напрямки (динамічно)
       ...directionStats,
