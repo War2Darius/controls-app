@@ -72,6 +72,13 @@ class DatabaseService {
   static async getStats() {
     const all = await this.getAll();
     const today = new Date().toISOString().split("T")[0];
+    const directions = getDirections();
+
+    // Підрахунок за напрямками
+    const directionStats = {};
+    directions.forEach(dir => {
+      directionStats[dir] = all.filter(r => r.direction === dir).length;
+    });
 
     return {
       total: all.length,
@@ -82,15 +89,8 @@ class DatabaseService {
         (r) => r.deadline < today && r.status !== STATUSES.COMPLETED,
       ).length,
 
-      // Напрямки
-      service: all.filter((r) => r.direction === DIRECTIONS.SERVICE).length,
-      chemistry: all.filter((r) => r.direction === DIRECTIONS.CHEMISTRY).length,
-      pyro: all.filter((r) => r.direction === DIRECTIONS.PYRO).length,
-      other: all.filter(
-        (r) =>
-          r.direction === DIRECTIONS.OTHER ||
-          (r.direction && !Object.values(DIRECTIONS).includes(r.direction)),
-      ).length,
+      // Напрямки (динамічно)
+      ...directionStats,
     };
   }
 }

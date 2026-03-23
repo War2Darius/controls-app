@@ -2,6 +2,13 @@
 // Цей файл містить 4 різні варіанти друку для тестування
 // Підключіть його тимчасово замість основного файлу друку
 
+// Отримуємо напрямки з config
+function getPrintDirections() {
+  return typeof getDirections === 'function' ? getDirections() : ["Службова діяльність", "Хімія", "Піротехніка", "Інше"];
+}
+
+window.getPrintDirections = getPrintDirections;
+
 // ==================== ВАРІАНТ 1: ПРОСТИЙ ДРУК ПОТОЧНОЇ СТОРІНКИ ====================
 
 function printVariant1_simple() {
@@ -302,7 +309,7 @@ function printVariant2_newWindow() {
 
                         let direction = row.direction;
                         if (
-                          row.direction === DIRECTIONS.OTHER &&
+                          row.direction === "Інше" &&
                           row.customDirection
                         ) {
                           direction = row.customDirection;
@@ -379,18 +386,11 @@ function printVariant3_detailed() {
   };
 
   // Групуємо за напрямками
-  const groupedByDirection = {
-    service: visibleRecords.filter((r) => r.direction === DIRECTIONS.SERVICE),
-    chemistry: visibleRecords.filter(
-      (r) => r.direction === DIRECTIONS.CHEMISTRY,
-    ),
-    pyro: visibleRecords.filter((r) => r.direction === DIRECTIONS.PYRO),
-    other: visibleRecords.filter(
-      (r) =>
-        r.direction === DIRECTIONS.OTHER ||
-        (r.direction && !Object.values(DIRECTIONS).includes(r.direction)),
-    ),
-  };
+  const directions = getDirections();
+  const groupedByDirection = {};
+  directions.forEach(dir => {
+    groupedByDirection[dir] = visibleRecords.filter((r) => r.direction === dir);
+  });
 
   const printContent = `
         <!DOCTYPE html>
@@ -800,34 +800,15 @@ function printVariant4_executive() {
                     <th>В роботі</th>
                     <th>Очікує</th>
                 </tr>
+                ${getPrintDirections().map(dir => `
                 <tr>
-                    <td>📋 Службова діяльність</td>
-                    <td>${stats.service}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.SERVICE && r.status === STATUSES.COMPLETED).length}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.SERVICE && r.status === STATUSES.IN_PROGRESS).length}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.SERVICE && r.status === STATUSES.PENDING).length}</td>
+                    <td>${dir}</td>
+                    <td>${visibleRecords.filter(r => r.direction === dir).length}</td>
+                    <td>${visibleRecords.filter(r => r.direction === dir && r.status === STATUSES.COMPLETED).length}</td>
+                    <td>${visibleRecords.filter(r => r.direction === dir && r.status === STATUSES.IN_PROGRESS).length}</td>
+                    <td>${visibleRecords.filter(r => r.direction === dir && r.status === STATUSES.PENDING).length}</td>
                 </tr>
-                <tr>
-                    <td>🧪 Хімія</td>
-                    <td>${stats.chemistry}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.CHEMISTRY && r.status === STATUSES.COMPLETED).length}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.CHEMISTRY && r.status === STATUSES.IN_PROGRESS).length}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.CHEMISTRY && r.status === STATUSES.PENDING).length}</td>
-                </tr>
-                <tr>
-                    <td>💥 Піротехніка</td>
-                    <td>${stats.pyro}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.PYRO && r.status === STATUSES.COMPLETED).length}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.PYRO && r.status === STATUSES.IN_PROGRESS).length}</td>
-                    <td>${visibleRecords.filter((r) => r.direction === DIRECTIONS.PYRO && r.status === STATUSES.PENDING).length}</td>
-                </tr>
-                <tr>
-                    <td>🔄 Інше</td>
-                    <td>${stats.other}</td>
-                    <td>${visibleRecords.filter((r) => (r.direction === DIRECTIONS.OTHER || !Object.values(DIRECTIONS).includes(r.direction)) && r.status === STATUSES.COMPLETED).length}</td>
-                    <td>${visibleRecords.filter((r) => (r.direction === DIRECTIONS.OTHER || !Object.values(DIRECTIONS).includes(r.direction)) && r.status === STATUSES.IN_PROGRESS).length}</td>
-                    <td>${visibleRecords.filter((r) => (r.direction === DIRECTIONS.OTHER || !Object.values(DIRECTIONS).includes(r.direction)) && r.status === STATUSES.PENDING).length}</td>
-                </tr>
+                `).join('')}
             </table>
 
             ${
@@ -905,15 +886,10 @@ function calculateStats(records) {
     overdue: records.filter(
       (r) => r.deadline < today && r.status !== STATUSES.COMPLETED,
     ).length,
-    service: records.filter((r) => r.direction === DIRECTIONS.SERVICE).length,
-    chemistry: records.filter((r) => r.direction === DIRECTIONS.CHEMISTRY)
-      .length,
-    pyro: records.filter((r) => r.direction === DIRECTIONS.PYRO).length,
-    other: records.filter(
-      (r) =>
-        r.direction === DIRECTIONS.OTHER ||
-        (r.direction && !Object.values(DIRECTIONS).includes(r.direction)),
-    ).length,
+    getPrintDirections()[0]: records.filter((r) => r.direction === getPrintDirections()[0]).length,
+    getPrintDirections()[1]: records.filter((r) => r.direction === getPrintDirections()[1]).length,
+    getPrintDirections()[2]: records.filter((r) => r.direction === getPrintDirections()[2]).length,
+    getPrintDirections()[3]: records.filter((r) => r.direction === getPrintDirections()[3]).length,
   };
 }
 

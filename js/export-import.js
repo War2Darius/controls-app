@@ -426,10 +426,11 @@ async function exportToExcel() {
     records.forEach((row, index) => {
       const orderDate = new Date(row.orderDate).toLocaleDateString("uk-UA");
       const deadline = new Date(row.deadline).toLocaleDateString("uk-UA");
-      const statusText = STATUS_LABELS[row.status] || "Очікує";
+      const statusLabels = window.getStatusLabels ? window.getStatusLabels() : {pending: "Очікує", "in-progress": "В роботі", completed: "Виконано"};
+      const statusText = statusLabels[row.status] || "Очікує";
 
       let direction = row.direction;
-      if (row.direction === DIRECTIONS.OTHER && row.customDirection) {
+      if (row.direction === "Інше" && row.customDirection) {
         direction = `${row.customDirection}`;
       }
 
@@ -473,3 +474,166 @@ window.exportToExcel = exportToExcel;
 window.exportToPDF = exportToPDF;
 window.closeModal = closeModal;
 window.processImport = processImport;
+window.importFromCSV = importFromCSV;
+
+// ==================== CSV ІМПОРТ ====================
+
+// Імпорт з CSV
+function importFromCSV() {
+  document.getElementById("csvFileInput").click();
+}
+
+// Обробник вибору CSV файлу
+async function handleCSVFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const importedData = parseCSV(text);
+
+    if (!importedData || importedData.length === 0) {
+      showNotification("Не вдалося розпарсити CSV файл", "error");
+      return;
+    }
+
+    // Показуємо модальне вікно з вибором дії
+    showImportModal(importedData);
+  } catch (error) {
+    console.error("Помилка при імпорті CSV:", error);
+    showNotification("Помилка при імпорті CSV. Перевірте формат файлу.", "error");
+  }
+
+  event.target.value = "";
+}
+
+// Парсинг CSV тексту
+function parseCSV(text) {
+  const lines = text.split("\n").filter(line => line.trim());
+  if (lines.length < 2) return [];
+
+  // Витягуємо заголовки
+  const headers = lines[0].split(";").map(h => h.trim().replace(/^"|"$/g, ""));
+  
+  // Маппінг колонок
+  const columnMap = {
+    "№": "num",
+    "НАЗВА НАКАЗУ": "orderName",
+    "НОМЕР НАКАЗУ": "orderNumber", 
+    "НОМЕР": "orderNumber",
+    "ДАТА": "orderDate",
+    "ДАТА НАКАЗУ": "orderDate",
+    "ЗАХОДИ": "measures",
+    "ПЕРІОДИЧНІСТЬ": "periodicity",
+    "ТЕРМІН": "deadline",
+    "ТЕРМІН ВИКОНАННЯ": "deadline",
+    "ВІДПОВІДАЛЬНИЙ": "responsible",
+    "НАПРЯМ": "direction",
+    "НАПРЯМОК": "direction",
+    "СТАТУС": "status"
+  };
+
+  const result = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseCSVLine(lines[i]);
+    if (values.length !== headers.length) continue;
+
+    const record = {};
+    headers.forEach((header, index) => {
+      const key = columnMap[header] || header;
+      let value = values[index].trim().replace(/^"|"$/g, "");
+      
+      // Конвертація дат
+      if ((key === "orderDate" || key === "deadline") && value) {
+        value = convertDateToISO(value);
+      }
+      
+      if (key !== "num") {
+        record[key] = value;
+      }
+    });
+
+    // Встановлюємо статус за замовчуванням
+    if (!record.status) {
+      record.status = "pending";
+    }
+
+    // Якщо напрямок "Інше" з customDirection
+    if (record.direction && record.direction.includes(":")) {
+      const parts = record.direction.split(":");
+      record.direction = "Інше";
+      record.customDirection = parts[1].trim();
+    }
+
+    if (record.orderName) {
+      result.push(record);
+    }
+  }
+
+  return result;
+}
+
+// Парсинг однієї CSV рядки з урахуванням лапок
+function parseCSVLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ";" && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+
+  return result;
+}
+
+// Конвертація дати в ISO формат
+function convertDateToISO(dateStr) {
+  // Спробуємо різні формати
+  const formats = [
+    /^(\d{4})-(\d{2})-(\d{2})$/, // YYYY-MM-DD
+    /^(\d{2})\.(\d{2})\.(\d{4})$/, // DD.MM.YYYY
+    /^(\d{2})\/(\d{2})\/(\d{4})$/, // DD/MM/YYYY
+  ];
+
+  for (const format of formats) {
+    const match = dateStr.match(format);
+    if (match) {
+      if (format === formats[0]) {
+        return dateStr;
+      } else if (format === formats[1] || format === formats[2]) {
+        const day = match[1];
+        const month = match[2];
+        const year = match[3];
+        return `${year}-${month}-${day}`;
+      }
+    }
+  }
+
+  // Якщо не вдалося розпарсити, повертаємо як є
+  return dateStr;
+}
+
+// Додаємо обробник для CSV input
+document.addEventListener("DOMContentLoaded", function() {
+  const csvInput = document.getElementById("csvFileInput");
+  if (csvInput) {
+    csvInput.addEventListener("change", handleCSVFileSelect);
+  }
+  
+  // Обробник для JSON input
+  const jsonInput = document.getElementById("fileInput");
+  if (jsonInput) {
+    jsonInput.addEventListener("change", handleFileSelect);
+  }
+});

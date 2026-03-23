@@ -38,8 +38,15 @@ function renderTable(records) {
 
 // Створення HTML рядка таблиці
 function createRowHtml(row, index) {
-  const statusClass = STATUS_CLASSES[row.status] || "status-pending";
-  const statusText = STATUS_LABELS[row.status] || "Очікує";
+  const statusLabels = window.getStatusLabels();
+  const statusKeys = window.getStatusKeys();
+  const statusClassMap = {
+    [statusKeys[0]]: "status-pending",
+    [statusKeys[1]]: "status-in-progress",
+    [statusKeys[2]]: "status-completed",
+  };
+  const statusClass = statusClassMap[row.status] || "status-pending";
+  const statusText = statusLabels[row.status] || "Очікує";
 
   // Форматування дат
   const orderDate = new Date(row.orderDate).toLocaleDateString("uk-UA");
@@ -47,17 +54,18 @@ function createRowHtml(row, index) {
 
   // Перевірка на прострочений термін
   const today = new Date().toISOString().split("T")[0];
-  const isOverdue = row.deadline < today && row.status !== STATUSES.COMPLETED;
+  const isOverdue = row.deadline < today && row.status !== window.STATUSES.COMPLETED;
 
   // Відображення напрямку (якщо "Інше", показуємо що саме)
   let direction = row.direction;
-  if (row.direction === DIRECTIONS.OTHER && row.customDirection) {
-    direction = `${DIRECTIONS.OTHER}: ${row.customDirection}`;
+  const directions = getDirections();
+  if (direction === "Інше" && row.customDirection) {
+    direction = `Інше: ${row.customDirection}`;
   }
 
-  const pdfIcon = row.pdfBlob ? 
-    `<span class="pdf-icon" onclick="openPdf(${row.id})" title="Відкрити PDF">📄</span>` : 
-    `<span class="pdf-icon pdf-icon-empty" title="PDF не прикріплено">📄</span>`;
+  const pdfIcon = row.pdfBlob
+    ? `<span class="pdf-icon" onclick="openPdf(${row.id})" title="Відкрити PDF">📄</span>`
+    : `<span class="pdf-icon pdf-icon-empty" title="PDF не прикріплено">📄</span>`;
 
   return `
         <tr id="row-${row.id}" ${isOverdue ? 'style="background-color: #fff5f5;"' : ""}>
@@ -83,6 +91,7 @@ function createRowHtml(row, index) {
 // Оновлення статистики
 async function updateStats() {
   const stats = await DB.service.getStats();
+  const directions = getDirections();
 
   // Блок статусів
   document.getElementById("statsStatus").innerHTML = `
@@ -94,15 +103,22 @@ async function updateStats() {
         <button class="reset-filter-btn" onclick="resetFilters()">🔄 Скинути фільтри</button>
     `;
 
-  // Блок напрямків
+  // Блок напрямків - динамічний
+  let directionsHtml = "";
+  const icons = [STATS_ICONS.service, STATS_ICONS.chemistry, STATS_ICONS.pyro, STATS_ICONS.other];
+  const statsValues = [stats.service, stats.chemistry, stats.pyro, stats.other];
+  
+  directions.forEach((dir, index) => {
+    const icon = icons[index] || STATS_ICONS.other;
+    const count = statsValues[index] || 0;
+    directionsHtml += `<span class="stat-item" onclick="filterByStat('direction', '${dir}')">${icon} ${dir}: ${count}</span>`;
+  });
+
   document.getElementById("statsDirection").innerHTML = `
-        <span class="stat-item" onclick="filterByStat('direction', '${DIRECTIONS.SERVICE}')">${STATS_ICONS.service} Служба: ${stats.service}</span>
-        <span class="stat-item" onclick="filterByStat('direction', '${DIRECTIONS.CHEMISTRY}')">${STATS_ICONS.chemistry} Хімія: ${stats.chemistry}</span>
-        <span class="stat-item" onclick="filterByStat('direction', '${DIRECTIONS.PYRO}')">${STATS_ICONS.pyro} Піро: ${stats.pyro}</span>
-        <span class="stat-item" onclick="filterByStat('direction', '${DIRECTIONS.OTHER}')">${STATS_ICONS.other} Інше: ${stats.other}</span>
+        ${directionsHtml}
         <span style="flex: 1;"></span>
         <span class="stat-item" style="background: rgba(255,255,255,0.1); cursor: default;">
-            🏷️ Всього напрямків: ${stats.service + stats.chemistry + stats.pyro + stats.other}
+            🏷️ Всього напрямків: ${Object.values(stats).reduce((a, b) => a + b, 0) - stats.total}
         </span>
     `;
 }
@@ -137,6 +153,7 @@ async function addRecord() {
   }
 
   try {
+    const directions = getDirections();
     const recordData = {
       orderName,
       orderNumber,
@@ -145,11 +162,12 @@ async function addRecord() {
       periodicity,
       deadline,
       responsible,
-      direction: direction === DIRECTIONS.OTHER ? DIRECTIONS.OTHER : direction,
+      direction: direction,
       status,
     };
 
-    if (direction === DIRECTIONS.OTHER && otherDirection) {
+    // Якщо вибрано "Інше" і введено свій напрямок
+    if (direction === "Інше" && otherDirection) {
       recordData.customDirection = otherDirection;
     }
 
@@ -201,8 +219,8 @@ async function editRecord(id) {
       const otherGroup = document.getElementById("otherDirectionGroup");
       const otherInput = document.getElementById("otherDirection");
 
-      if (record.direction === DIRECTIONS.OTHER && record.customDirection) {
-        directionSelect.value = DIRECTIONS.OTHER;
+      if (record.direction === "Інше" && record.customDirection) {
+        directionSelect.value = "Інше";
         otherGroup.style.display = "block";
         otherInput.value = record.customDirection || "";
       } else {
@@ -212,7 +230,7 @@ async function editRecord(id) {
       }
 
       document.getElementById("status").value =
-        record.status || STATUSES.PENDING;
+        record.status || window.STATUSES.PENDING;
 
       if (record.pdfName) {
         document.getElementById("pdfFileName").textContent = record.pdfName;
@@ -266,7 +284,7 @@ function clearForm() {
   document.getElementById("direction").value = "";
   document.getElementById("otherDirectionGroup").style.display = "none";
   document.getElementById("otherDirection").value = "";
-  document.getElementById("status").value = STATUSES.PENDING;
+  document.getElementById("status").value = window.STATUSES.PENDING;
   clearPdfFile();
 }
 
@@ -303,6 +321,7 @@ async function filterByStat(type, value = null) {
   try {
     let filtered = allRecords;
     const today = new Date().toISOString().split("T")[0];
+    const directions = getDirections();
 
     document.getElementById("searchInput").value = "";
     document.getElementById("statusFilter").value = "all";
@@ -312,29 +331,21 @@ async function filterByStat(type, value = null) {
         filtered = allRecords;
         break;
       case "completed":
-        filtered = allRecords.filter((r) => r.status === STATUSES.COMPLETED);
+        filtered = allRecords.filter((r) => r.status === window.STATUSES.COMPLETED);
         break;
       case "in-progress":
-        filtered = allRecords.filter((r) => r.status === STATUSES.IN_PROGRESS);
+        filtered = allRecords.filter((r) => r.status === window.STATUSES.IN_PROGRESS);
         break;
       case "pending":
-        filtered = allRecords.filter((r) => r.status === STATUSES.PENDING);
+        filtered = allRecords.filter((r) => r.status === window.STATUSES.PENDING);
         break;
       case "overdue":
         filtered = allRecords.filter(
-          (r) => r.deadline < today && r.status !== STATUSES.COMPLETED,
+          (r) => r.deadline < today && r.status !== window.STATUSES.COMPLETED,
         );
         break;
       case "direction":
-        if (value === DIRECTIONS.OTHER) {
-          filtered = allRecords.filter(
-            (r) =>
-              r.direction === DIRECTIONS.OTHER ||
-              (r.direction && !isStandardDirection(r.direction)),
-          );
-        } else {
-          filtered = allRecords.filter((r) => r.direction === value);
-        }
+        filtered = allRecords.filter((r) => r.direction === value);
         break;
     }
 
@@ -368,25 +379,16 @@ function highlightActiveFilter(type, value) {
       overdue: 4,
     };
 
-    const directionMap = {
-      [DIRECTIONS.SERVICE]: 0,
-      [DIRECTIONS.CHEMISTRY]: 1,
-      [DIRECTIONS.PYRO]: 2,
-      [DIRECTIONS.OTHER]: 3,
-    };
-
     if (type === "all" && statusItems[0]) {
       statusItems[0].classList.add("active-filter");
     } else if (indexMap[type] !== undefined && statusItems[indexMap[type]]) {
       statusItems[indexMap[type]].classList.add("active-filter");
-    } else if (
-      type === "direction" &&
-      value &&
-      directionMap[value] !== undefined
-    ) {
-      const idx = directionMap[value];
-      if (directionItems[idx]) {
-        directionItems[idx].classList.add("active-filter");
+    } else if (type === "direction" && value) {
+      // Знаходимо індекс напрямку
+      const directions = getDirections();
+      const dirIndex = directions.indexOf(value);
+      if (dirIndex !== -1 && directionItems[dirIndex]) {
+        directionItems[dirIndex].classList.add("active-filter");
       }
     }
   }, 10);
@@ -409,7 +411,8 @@ function setupDirectionHandler() {
   const otherInput = document.getElementById("otherDirection");
 
   directionSelect.addEventListener("change", function () {
-    if (this.value === DIRECTIONS.OTHER) {
+    const directions = getDirections();
+    if (this.value === directions[3] || this.value === "Інше") {
       otherGroup.style.display = "block";
       otherInput.required = true;
     } else {
@@ -422,29 +425,65 @@ function setupDirectionHandler() {
 
 // Заповнення випадаючих списків
 function populateSelects() {
-  // Періодичність
+  updatePeriodicitySelect();
+  updateDirectionSelect();
+  updateResponsibleSelect();
+  updateStatusSelect();
+  updateStatusFilter();
+}
+
+function updatePeriodicitySelect() {
   const periodicitySelect = document.getElementById("periodicity");
+  const options = window.getPeriodicityOptions();
   periodicitySelect.innerHTML =
     '<option value="">Оберіть періодичність</option>' +
-    PERIODICITY_OPTIONS.map(
+    options.map(
       (p) => `<option value="${p.value}">${p.label}</option>`,
     ).join("");
+}
 
-  // Напрямки
+function updateDirectionSelect() {
   const directionSelect = document.getElementById("direction");
   directionSelect.innerHTML =
     '<option value="">Оберіть напрямок</option>' +
-    Object.values(DIRECTIONS)
+    getDirections()
       .map((d) => `<option value="${d}">${d}</option>`)
       .join("");
+}
 
-  // Відповідальні особи
+function updateResponsibleSelect() {
   const responsibleSelect = document.getElementById("responsible");
   responsibleSelect.innerHTML =
     '<option value="">Оберіть відповідального</option>' +
-    RESPONSIBLE_PERSONS.map(
-      (person) => `<option value="${person}">${person}</option>`,
-    ).join("");
+    getResponsiblePersons()
+      .map((person) => `<option value="${person}">${person}</option>`)
+      .join("");
+}
+
+function updateStatusSelect() {
+  const statusSelect = document.getElementById("status");
+  const labels = window.getStatusLabels();
+  statusSelect.innerHTML = Object.entries(labels)
+    .map(
+      ([key, label]) => `<option value="${key}">${label}</option>`,
+    )
+    .join("");
+}
+
+function updateStatusFilter() {
+  const statusFilter = document.getElementById("statusFilter");
+  const labels = window.getStatusLabels();
+  statusFilter.innerHTML =
+    '<option value="all">📋 Всі записи</option>' +
+    Object.entries(labels)
+      .map(
+        ([key, label]) => `<option value="${key}">${label}</option>`,
+      )
+      .join("");
+}
+
+function refreshMainPage() {
+  loadData();
 }
 
 // Ініціалізація програми
@@ -495,7 +534,7 @@ function setupPdfHandler() {
   const pdfFileName = document.getElementById("pdfFileName");
   const clearPdfBtn = document.getElementById("clearPdfBtn");
 
-  pdfInput.addEventListener("change", function(e) {
+  pdfInput.addEventListener("change", function (e) {
     const file = e.target.files[0];
     if (file) {
       if (file.type !== "application/pdf") {
@@ -504,7 +543,7 @@ function setupPdfHandler() {
         return;
       }
       const reader = new FileReader();
-      reader.onload = function(event) {
+      reader.onload = function (event) {
         currentPdfBlob = event.target.result;
         currentPdfName = file.name;
         pdfFileName.textContent = file.name;
@@ -552,3 +591,9 @@ window.filterByStat = filterByStat;
 window.resetFilters = resetFilters;
 window.clearPdfFile = clearPdfFile;
 window.openPdf = openPdf;
+window.updatePeriodicitySelect = updatePeriodicitySelect;
+window.updateStatusSelect = updateStatusSelect;
+window.updateStatusFilter = updateStatusFilter;
+window.refreshMainPage = refreshMainPage;
+window.updateDirectionSelect = updateDirectionSelect;
+window.updateResponsibleSelect = updateResponsibleSelect;

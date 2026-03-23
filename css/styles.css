@@ -29,6 +29,36 @@ h1 {
     letter-spacing: 2px;
 }
 
+.header-with-settings {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.header-with-settings h1 {
+    margin-bottom: 0;
+}
+
+.btn-settings {
+    position: absolute;
+    right: 0;
+    background: #718096;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: all 0.3s;
+}
+
+.btn-settings:hover {
+    background: #4a5568;
+    transform: rotate(90deg);
+}
+
 .add-form {
     background: #f8f9fa;
     padding: 25px;
@@ -473,6 +503,216 @@ tr:hover {
     flex-shrink: 0;
 }
 
-.form-buttons button {
-    flex-shrink: 0;
+/* ==================== MODAL STYLES ==================== */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.add-person-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-person-form input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e1e1e1;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.add-person-form button {
+    padding: 10px 15px;
+    background: #48bb78;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.add-person-form button:hover {
+    background: #38a169;
+}
+
+.responsible-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.responsible-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.responsible-list li:last-child {
+    border-bottom: none;
+}
+
+.btn-remove-person {
+    background: #f56565;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.btn-remove-person:hover {
+    background: #e53e3e;
+}
+
+/* ==================== SETTINGS MODAL ==================== */
+.settings-modal {
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.settings-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.settings-section h3 {
+    color: #555;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.direction-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-edit-direction {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.btn-edit-direction:hover {
+    background: #3182ce;
+}
+
+/* ==================== EXPORT/IMPORT BUTTONS ==================== */
+.export-import-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.export-import-buttons .export-btn,
+.export-import-buttons .import-btn {
+    padding: 10px 15px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.export-import-buttons .export-btn {
+    background: #38a169;
+    color: white;
+}
+
+.export-import-buttons .export-btn:hover {
+    background: #2f855a;
+}
+
+.export-import-buttons .import-btn {
+    background: #ed8936;
+    color: white;
+}
+
+.export-import-buttons .import-btn:hover {
+    background: #dd6b20;
+}
+
+/* ==================== FOOTER ==================== */
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+}
+
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 10px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.github-link:hover {
+    background: #e1e1e1;
+    transform: translateY(-2px);
+}
+
+.github-link svg {
+    width: 24px;
+    height: 24px;
 }
