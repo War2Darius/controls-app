@@ -1,0 +1,17 @@
+{
+  "name": "Облік контролів",
+  "short_name": "Контролі",
+  "description": "Облік контролів та протокольних рішень",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "."
+}
