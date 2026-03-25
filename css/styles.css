@@ -1181,3 +1181,50 @@ tr:hover {
     border-radius: 8px;
     border-left: 3px solid #667eea;
 }
+
+/* ==================== ЛОГОТИП ==================== */
+.app-logo {
+    position: absolute;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+}
+
+.app-logo img {
+    width: 36px;
+    height: 36px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: transform 0.2s ease;
+}
+
+.app-logo img:hover {
+    transform: scale(1.05);
+}
+
+/* Адаптація для мобільних */
+@media (max-width: 768px) {
+    .app-logo {
+        width: 40px;
+    }
+
+    .app-logo img {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* Якщо логотип заважає на маленьких екранах */
+@media (max-width: 480px) {
+    .app-logo {
+        position: static;
+        margin-right: 8px;
+    }
+
+    .header-with-settings {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
